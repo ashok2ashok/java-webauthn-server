@@ -245,10 +245,7 @@ final class WebAuthnCodecs {
       throws InvalidKeySpecException, NoSuchAlgorithmException {
     final ByteArray rawKey = new ByteArray(cose.get(CBORObject.FromObject(-2)).GetByteString());
     final ByteArray x509Key =
-        new ByteArray(new byte[] {0x30, (byte) (ED25519_CURVE_OID.size() + 3 + rawKey.size())})
-            .concat(ED25519_CURVE_OID)
-            .concat(new ByteArray(new byte[] {0x03, (byte) (rawKey.size() + 1), 0}))
-            .concat(rawKey);
+        encodeDerSequence(ED25519_CURVE_OID, encodeDerBitStringWithZeroUnused(rawKey));
 
     KeyFactory kFact = KeyFactory.getInstance("EdDSA");
     return kFact.generatePublic(new X509EncodedKeySpec(x509Key.getBytes()));
